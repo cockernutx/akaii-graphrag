@@ -1,0 +1,43 @@
+syntax = "proto3";
+package searcher;
+
+import "google/protobuf/struct.proto";
+
+service Searcher {
+    rpc SimilaritySearch(SimilaritySearchMessage) returns (SimilaritySearchResponse);
+    rpc GetNode(GetNodeMessage) returns (GetNodeResponse);
+}
+
+message SimilaritySearchMessage {
+    string text = 1;
+    float minimun_similarity = 2;
+}
+
+message SimilaritySearchResponse {
+    repeated SimilarText similar_texts = 1;
+}
+message SimilarText {
+    string id = 1;
+    string text = 2;
+    float similarity = 3;
+    repeated string mentions = 4;
+}
+
+message GetNodeMessage {
+    string id = 1;
+    string tb = 2;
+}
+
+message GetNodeResponse {
+    google.protobuf.Struct content = 1;
+    repeated Relation relations = 2;
+}
+
+message Relation {
+    RelationReference references = 1;
+    float weight = 2;
+}
+message RelationReference {
+    string tb = 1;
+    string id = 2;
+}

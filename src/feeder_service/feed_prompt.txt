@@ -1,0 +1,252 @@
+Translate the user content as entity relation triplet in 
+{
+    "in": {
+        "table": "",
+        "id": "",
+        "content": {}
+    }, 
+    "relation": "", 
+    "out": {
+        "table": "",
+        "id": "",
+        content: {}
+    }
+} 
+json format. 
+The property "table" of the properties "in" and "out" is what the subject should be, for example: Joseph is a person and that would output "table": "person".
+The property "id" of the properties "in" and "out" should reference the actual subject, for example: The person Joseph would have "id": "Joseph".
+The property "content" of the properties "in" and "out" is to be used to store any relevant information about the subject, for example: The person Joseph would generate the output "content": {"name": "Joseph"}
+"relation" should have underscores ("_") instead of spaces.
+
+## EXAMPLE ##
+
+# INPUT: 
+
+
+Helldivers 2 is a 2024 cooperative third-person shooter game developed by Arrowhead Game Studios and published by Sony Interactive Entertainment. The game is the direct sequel to Helldivers, a 2015 top-down shooter. It was released for PlayStation 5 and Windows on 8 February 2024.
+
+Helldivers 2 received positive reviews from critics and became PlayStation's fastest selling title of all time, surpassing 12 million units within 12 weeks of its release, as well as Sony's most successful Windows title. 
+
+Unlike Helldivers, which is a top-down shooter, Helldivers 2 is a third-person shooter.[2] Players take the role of the titular 'Helldivers', elite shock troops dropped from orbit onto hostile planets in bullet-like 'Hellpods'. Gameplay consists of operations where players must complete missions in procedurally generated levels while fending off hordes of enemies, after which they can attempt to call a ship to extract themselves to their Super Destroyer orbiting the planet. Players may choose the difficulty level of their operations ranging from level 1 (Trivial) to level 10 (Super Helldive). Players must unlock each consecutive difficulty by completing an operation on each level. Completing higher difficulty missions results in larger gains of experience points and in-game currency.
+
+# OUTPUT:
+
+[
+  {
+    "in": {
+      "table": "game",
+      "id": "Helldivers_2",
+      "content": {
+        "name": "Helldivers 2",
+        "release_year": 2024,
+        "genre": "third-person shooter",
+        "type": "cooperative"
+      }
+    },
+    "relation": "developed_by",
+    "out": {
+      "table": "company",
+      "id": "Arrowhead_Game_Studios",
+      "content": {
+        "name": "Arrowhead Game Studios"
+      }
+    }
+  },
+  {
+    "in": {
+      "table": "game",
+      "id": "Helldivers_2",
+      "content": {
+        "name": "Helldivers 2"
+      }
+    },
+    "relation": "published_by",
+    "out": {
+      "table": "company",
+      "id": "Sony_Interactive_Entertainment",
+      "content": {
+        "name": "Sony Interactive Entertainment"
+      }
+    }
+  },
+  {
+    "in": {
+      "table": "game",
+      "id": "Helldivers_2",
+      "content": {
+        "name": "Helldivers 2",
+        "release_date": "8 February 2024"
+      }
+    },
+    "relation": "released_on",
+    "out": {
+      "table": "platform",
+      "id": "PlayStation_5_Windows",
+      "content": {
+        "platforms": ["PlayStation 5", "Windows"]
+      }
+    }
+  },
+  {
+    "in": {
+      "table": "game",
+      "id": "Helldivers_2",
+      "content": {
+        "name": "Helldivers 2"
+      }
+    },
+    "relation": "is_sequel_to",
+    "out": {
+      "table": "game",
+      "id": "Helldivers",
+      "content": {
+        "name": "Helldivers",
+        "release_year": 2015,
+        "genre": "top-down shooter"
+      }
+    }
+  },
+  {
+    "in": {
+      "table": "game",
+      "id": "Helldivers_2",
+      "content": {
+        "name": "Helldivers 2"
+      }
+    },
+    "relation": "received_reviews",
+    "out": {
+      "table": "review",
+      "id": "Helldivers_2_reviews",
+      "content": {
+        "type": "positive"
+      }
+    }
+  },
+  {
+    "in": {
+      "table": "game",
+      "id": "Helldivers_2",
+      "content": {
+        "name": "Helldivers 2"
+      }
+    },
+    "relation": "became_fastest_selling",
+    "out": {
+      "table": "title",
+      "id": "PlayStation_fastest_selling_title",
+      "content": {
+        "units_sold": "12 million",
+        "time_frame": "12 weeks"
+      }
+    }
+  },
+  {
+    "in": {
+      "table": "game",
+      "id": "Helldivers_2",
+      "content": {
+        "name": "Helldivers 2"
+      }
+    },
+    "relation": "is_most_successful",
+    "out": {
+      "table": "title",
+      "id": "Sony_most_successful_Windows_title",
+      "content": {}
+    }
+  },
+  {
+    "in": {
+      "table": "game",
+      "id": "Helldivers",
+      "content": {
+        "name": "Helldivers",
+        "genre": "top-down shooter"
+      }
+    },
+    "relation": "is_different_from",
+    "out": {
+      "table": "game",
+      "id": "Helldivers_2",
+      "content": {
+        "name": "Helldivers 2",
+        "genre": "third-person shooter"
+      }
+    }
+  },
+  {
+    "in": {
+      "table": "player",
+      "id": "Helldiver",
+      "content": {
+        "role": "elite shock troops"
+      }
+    },
+    "relation": "dropped_from",
+    "out": {
+      "table": "object",
+      "id": "Hellpod",
+      "content": {
+        "type": "bullet-like pod"
+      }
+    }
+  },
+  {
+    "in": {
+      "table": "operation",
+      "id": "gameplay_operation",
+      "content": {
+        "difficulty_levels": {
+          "min": 1,
+          "max": 10,
+          "names": {
+            "1": "Trivial",
+            "10": "Super Helldive"
+          }
+        }
+      }
+    },
+    "relation": "performed_in",
+    "out": {
+      "table": "level",
+      "id": "procedurally_generated_levels",
+      "content": {}
+    }
+  },
+  {
+    "in": {
+      "table": "player",
+      "id": "Helldiver",
+      "content": {
+        "role": "elite shock troops"
+      }
+    },
+    "relation": "fends_off",
+    "out": {
+      "table": "enemy",
+      "id": "hordes_of_enemies",
+      "content": {}
+    }
+  },
+  {
+    "in": {
+      "table": "player",
+      "id": "Helldiver",
+      "content": {
+        "role": "elite shock troops"
+      }
+    },
+    "relation": "earns",
+    "out": {
+      "table": "rewards",
+      "id": "experience_and_currency",
+      "content": {
+        "experience_points": true,
+        "in-game_currency": true
+      }
+    }
+  }
+]
+
+## END EXAMPLE ##

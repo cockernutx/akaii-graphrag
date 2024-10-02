@@ -1,0 +1,7 @@
+FROM rust:latest
+
+RUN apt update && apt upgrade -y
+RUN apt install -y protobuf-compiler libprotobuf-dev
+RUN rustup component add rustfmt
+RUN cargo install cargo-watch
+RUN cargo install surrealdb-migrations

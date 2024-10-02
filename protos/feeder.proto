@@ -1,0 +1,15 @@
+syntax = "proto3";
+package feeder;
+
+service Feeder {
+    rpc Feed (FeedMessage) returns (FeedResponse);
+}
+
+message FeedMessage {
+    string text = 1;
+    float weight = 2;
+}
+
+message FeedResponse {
+    string article_id = 1;
+}
