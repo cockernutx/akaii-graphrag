@@ -15,7 +15,7 @@ use tonic::{Request, Response, Status};
 use tonic_types::ErrorDetails;
 
 use crate::proto::{
-    searcher_server::Searcher, GetNodeMessage, GetNodeResponse, SimilarText, SimilaritySearchMessage, SimilaritySearchResponse
+    searcher_server::Searcher, Node, GetNodeResponse, SimilarText, SimilaritySearchMessage, SimilaritySearchResponse
 };
 
 pub struct SearcherService {
@@ -26,31 +26,6 @@ pub struct SearcherService {
 impl SearcherService {
     pub fn new(surreal: Arc<Surreal<Client>>, ollama: Arc<Ollama>) -> Self {
         Self { surreal, ollama }
-    }
-}
-
-#[derive(Serialize, Deserialize)]
-struct DatabaseSimilarTexts {
-    id: Thing,
-    text: String,
-    similarity: f32,
-    mentions: Vec<Thing>
-}
-
-impl Into<SimilarText> for DatabaseSimilarTexts {
-    fn into(self) -> SimilarText {
-        SimilarText {
-            id: self.id.to_string(),
-            text: self.text,
-            similarity: self.similarity,
-            mentions: self.mentions.into_iter().map(|f| f.to_string()).collect()
-        }
-    }
-}
-
-impl FromIterator<DatabaseSimilarTexts> for Vec<SimilarText> {
-    fn from_iter<T: IntoIterator<Item = DatabaseSimilarTexts>>(iter: T) -> Self {
-        iter.into_iter().map(|f| std::convert::Into::<SimilarText>::into(f)).collect()
     }
 }
 
@@ -79,32 +54,55 @@ impl Searcher for SearcherService {
         let embeddings = embeddings.embeddings.into_iter().flatten().collect::<Vec<f32>>();
         
         let mut resp = self.surreal.query(r#"
-                SELECT *, (SELECT VALUE out FROM <->?) AS mentions, vector::similarity::cosine(embeddings, $input_vector) AS similarity OMIT embeddings FROM _input_articles_ WHERE embeddings <|1|> $input_vector ORDER BY similarity DESC LIMIT 300
+                SELECT *, type::string(id) AS id, (SELECT record::tb(out) AS tb, record::id(out) AS id FROM <->?) AS mentions, vector::similarity::cosine(embeddings, $input_vector) AS similarity OMIT embeddings FROM _input_articles_ WHERE embeddings <|1|> $input_vector ORDER BY similarity DESC LIMIT 300
                 "#)
                 .bind(("input_vector", embeddings))
                 .await.unwrap();
 
-        let similar_texts: Vec<DatabaseSimilarTexts> = resp.take(0).unwrap();
-        let similar_texts = similar_texts
-            .into_iter()
-            .filter(|v| v.similarity >= request.minimun_similarity)
-            .collect();
+        let similar_texts: Vec<SimilarText> = resp.take(0).unwrap();
+    
 
         Ok(Response::new(SimilaritySearchResponse { similar_texts }))
     }
 
-    async fn get_node(&self, request: Request<GetNodeMessage>) -> Result<Response<GetNodeResponse>, Status> {
+    async fn get_node(&self, request: Request<Node>) -> Result<Response<GetNodeResponse>, Status> {
         let request = request.into_inner();
 
         let record = Thing::from((request.tb, request.id));
 
         let mut resp = self.surreal.query(r#"
-        SELECT $this.* AS content.fields, (SELECT record::tb(out) AS references.tb, record::id(out) AS references.id, weight FROM <->? ORDER BY weight) AS relations FROM $record
-        "#).bind(("record", record)).await.unwrap();
+        SELECT (SELECT IF out == $record
+            { {
+                id: record::id($parent.in),
+                tb: record::tb($parent.in)
+            } }
+        ELSE
+            { {
+                id: record::id($parent.out),
+                tb: record::tb($parent.out)
+            } }
+         AS references, weight, record::tb(id) AS relation_type FROM <->? ORDER BY weight ) AS relations FROM $record;
+        "#).bind(("record", record.clone())).await.unwrap();
 
         let resp: Option<GetNodeResponse> = resp.take(0).unwrap();
         match resp {
-            Some(r) => Ok(Response::new(r)),
+            Some(mut node_resp) => {
+                let mut resp = self.surreal.query(r#"
+                BEGIN TRANSACTION;
+                LET $obj = SELECT * FROM $record;
+                
+                RETURN function($obj) {
+                    let [obj] = arguments;
+                    return JSON.stringify(obj[0])
+                };
+                COMMIT TRANSACTION;
+                "#).bind(("record", record)).await.unwrap();
+                let Ok(content) = resp.take::<Option<String>>(0) else {
+                    return Err(Status::internal("error executing query on database"))
+                };
+                node_resp.content = content;
+                Ok(Response::new(node_resp))
+            },
             None => Err(Status::not_found("node not found")),
         }
     }
