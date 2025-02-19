@@ -1,0 +1,9 @@
+DEFINE TABLE OVERWRITE input_article_chunk SCHEMAFULL;
+
+DEFINE FIELD OVERWRITE article ON TABLE input_article_chunk TYPE record<input_article>;
+DEFINE FIELD OVERWRITE chunk_text ON TABLE input_article_chunk TYPE string;
+DEFINE FIELD OVERWRITE embeddings ON TABLE input_article_chunk TYPE array<float, 1024>;
+
+DEFINE INDEX OVERWRITE hnsw_embeddings ON TABLE input_article_chunk 
+    FIELDS embeddings 
+    HNSW DIMENSION 1024;

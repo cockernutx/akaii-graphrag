@@ -1,0 +1,8 @@
+FROM docker.io/rust:latest
+
+RUN rustup component add rustfmt
+RUN cargo install cargo-watch
+RUN cargo install surrealdb-migrations
+RUN apt update -y
+RUN apt install curl -y
+RUN curl -fsSL https://ollama.com/install.sh | sh

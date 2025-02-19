@@ -1,0 +1,68 @@
+Translate the received content into the following json schema:
+
+```json
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "properties": {
+    "entities": {
+      "type": "array",
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "title": {
+              "type": "string"
+            },
+            "data": {
+              "type": "object"
+            }
+          },
+          "required": [
+            "title",
+            "data"
+          ]
+        }
+      ]
+    },
+    "relations": {
+      "type": "array",
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "from": {
+              "type": "string"
+            },
+            "to": {
+              "type": "string"
+            },
+            "relation": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "from",
+            "to",
+            "relation"
+          ]
+        }
+      ]
+    }
+  },
+  "required": [
+    "entities",
+    "relations"
+  ]
+}
+```
+Property "entities":
+This property represents all entities in the text, with the property "title" defining the title of this entity and the property "content" defining an object of all the attributes this entity posses. 
+The property title shall be as descriptive as possible in order to avoid conflict with other entities, like the wikipedia article naming convention.
+No property can be null or empty.
+
+Property "relations":
+This property represents the relationship between entities, with "from" representing the first entity and "to" representing the second entity, the property "relationship" defines the relation between those two entities. 
+No property can be null or empty.
+
+The output should only contain the json and no other information.

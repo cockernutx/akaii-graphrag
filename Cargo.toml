@@ -1,0 +1,24 @@
+[package]
+name = "akaii-graphrag"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+chrono = "0.4.38"
+
+axum = {version = "0.7.9", features = ["macros", "ws"]}
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0.128"
+axum-macros = "0.4.1"
+surrealdb = "2.2.0"
+aide = { version = "0.13.4", features = ["axum", "scalar", "macros", "axum-extra"] }
+tokio = { version = "1.40.0", features = ["macros", "rt-multi-thread"] }
+tracing = "0.1.41"
+tracing-subscriber  = "0.3.19"
+axum-extra = {version = "0.9.6", features = ["typed-header"]}
+thiserror = "2.0.11"
+schemars = "0.8.21"
+axum-error-handler = "0.1.1"
+regex = "1.11.1"
+ollama-oxide = {git = "https://github.com/cockernutx/ollama-oxide.git"}
+futures = "0.3.31"

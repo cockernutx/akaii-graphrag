@@ -1,0 +1,9 @@
+[core]
+    schema = "full"
+
+[db]
+    address = "ws://surrealdb:8000"
+    username = "root"
+    password = "root"
+    ns = "akaii-graphrag"
+    db = "akaii-graphragdb"

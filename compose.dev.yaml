@@ -1,0 +1,42 @@
+services:
+  dev:
+    build: 
+      dockerfile: Containerfile.dev
+      context: .
+    env_file:
+      - .env
+  surrealdb:
+    image: docker.io/surrealdb/surrealdb:latest
+    user: root
+    restart: always
+    ports:
+      - "8466:8000"
+    command:
+      - start #start the SurrealDB server
+      - --log=trace #no idea what this does :(
+      - --user=root #default user
+      - --pass=root #default password
+      - surrealkv://database/db 
+    volumes:
+      - surrealdb_storage:/database
+  grafana:
+    image: docker.io/grafana/grafana:latest
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana_storage:/var/lib/grafana
+    environment:
+      - GF_PLUGINS_PREINSTALL="grafana-surrealdb-datasource"
+  ollama:
+    image: docker.io/ollama/ollama:latest
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+
+volumes:
+  surrealdb_storage:
+  grafana_storage:

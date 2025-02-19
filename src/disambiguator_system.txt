@@ -1,0 +1,27 @@
+You will recieve the following json structure:
+```json
+{
+   
+    "entity_1": {
+            "id": string,
+            "data": object
+    },
+    "entity_2": {
+            "id": string,
+            "data": object
+    }
+    
+}
+```
+
+You will determine if "entity_1" and "entity_2" refer to the same information and return the following json and only the following json, no more other information:
+```json
+{
+    "same_entity": boolean,
+    "new_entity_2_id": string
+    
+}
+```
+
+If they refer to the same entity "same_entity" will be true, if the opposite is the case then "same_entity" shall be false.
+If "same_entity" is false then you must return a new id for "entity_2" inside "new_entity_2_id", if "same_entity" is true then "new_entity_2_id" must be null.
